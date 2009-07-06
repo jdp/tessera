@@ -1,12 +1,12 @@
 # Tessera
 
-Tessera is an extremely tiny PHP framework modeleted after [web.py](http://webpy.org), [Sinatra](http://sinatrarb.org), and [Juno](http://brianreily.com/project/juno/).
+Tessera is an extremely tiny PHP framework modeleted after [web.py](http://webpy.org), [Sinatra](http://sinatrarb.com), and [Juno](http://brianreily.com/project/juno/).
 It allows the developer to map URLs directly to class methods.
 
 ## Your first application, or: never looking back
 
 Creating a working application in Tessera is more than easy.
-All that needs to happen is a subclassing of the Tessera class.
+All that needs to happen is a superclassing of the Tessera class.
 Here's a fully functional application:
 
     <?php
@@ -22,12 +22,13 @@ Here's a fully functional application:
         '/' => 'index'
     ));
 
-That's it. That's an entire Tessera application that responds to a request to /, which gets mapped to the index method of BasicApp.
-If you save that as basic.php in a directory where tessera.php is visible and visit it in your browser, you should be greeted with Eiffel 65 lyrics.
+That's it. Save that as **basic.php** in your document root, and visit **yourdomain.com/basic.php**.
+That's an entire Tessera application that responds to a request to /, which gets mapped to the `index` method of BasicApp.
+If everything was done properly, you should be greeted with Eiffel 65 lyrics.
 
 ### Getting nutty
 
-If you want to explore Tessera more, check out the [project wiki](http://github.com/jdp/tessera/wikis).
+If you want to explore Tessera more, check out the [project wiki](http://wiki.github.com/jdp/tessera).
 
 ## About
 

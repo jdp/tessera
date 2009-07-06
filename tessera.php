@@ -59,10 +59,10 @@ class Tessera {
 	}
 	
 	/**
-	 * Returns a nicely formatted platform-independent path
+	 * Returns a nicely formatted platform-independent path. Takes a variable number of arguments, each being part of a path
 	 * @return string
 	 */
-	function path_join() {
+	private function path_join() {
 		return join(func_get_args(), DIRECTORY_SEPARATOR);
 	}
 	
@@ -71,7 +71,7 @@ class Tessera {
 	 * @param string $local The name of the variable
 	 * @param mixed $value The value of the variable
 	 */
-	function set($local, $value) {
+	private function set($local, $value) {
 		if (is_string($local) && preg_match('/^[a-zA-Z_\x7f-\xff][a-zA-Z0-9_\x7f-\xff]*$/', $local)) {
 			$this->locals[$local] = $value;
 		}

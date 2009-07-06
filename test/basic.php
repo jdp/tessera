@@ -1,10 +1,6 @@
 <?php
 require '../tessera.php';
 
-echo "<pre>";
-print_r($_SERVER);
-echo "</pre>";
-
 class BasicApp extends Tessera {
 
 	function index() {

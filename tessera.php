@@ -6,10 +6,6 @@
  * @license http://www.opensource.org/licenses/mit-license.php The MIT License
  * @package Tessera
  */
- 
-if (!defined('__DIR__')) {
-	define('__DIR__', dirname(__FILE__));
-}
 
 error_reporting(E_ALL);
 
@@ -71,7 +67,7 @@ class Tessera {
 	 * @param string $local The name of the variable
 	 * @param mixed $value The value of the variable
 	 */
-	private function set($local, $value) {
+	function set($local, $value) {
 		if (is_string($local) && preg_match('/^[a-zA-Z_\x7f-\xff][a-zA-Z0-9_\x7f-\xff]*$/', $local)) {
 			$this->locals[$local] = $value;
 		}
@@ -126,7 +122,9 @@ class Tessera {
 	 */
 	private function respond($action) {
 		/* Layout defaults to layout.html, and view to <action>.html */
-		$this->view = $action;
+		if (!isset($this->view)) {
+			$this->view = $action;
+		}
 		/* Make sure the action is callable and not a Tessera internal */
 		$protected_actions = array('path_join', 'set', 'compileRoutes', 'routeRequest', 'respond');
 		if (!is_callable(array($this, $action)) || in_array($action, $protected_actions)) {
@@ -144,7 +142,7 @@ class Tessera {
 			${$__local} = $__value;
 		}
 		/* Load and execute the view file if it exists. Otherwise its value is the script output */
-		$view_file = $this->path_join(__DIR__, 'views', $this->view . '.html');
+		$view_file = $this->path_join('views', $this->view . '.html');
 		if (is_file($view_file)) {
 			ob_start();
 			include $view_file;
@@ -155,7 +153,7 @@ class Tessera {
 		}
 		/* Load, execute, and display the layout file. If it can't, display the view output */
 		if (isset($this->layout)) {
-			$layout_file = $this->path_join(__DIR__, 'views', $this->layout . '.html');
+			$layout_file = $this->path_join('views', $this->layout . '.html');
 			if (!is_file($layout_file)) {
 				trigger_error("Layout file <strong>{$layout_file}</strong> associated with <strong>{$action}</strong> not found", E_USER_ERROR);
 			}

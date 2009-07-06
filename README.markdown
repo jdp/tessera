@@ -1,7 +1,7 @@
 # Tessera
 
 Tessera is an extremely tiny PHP framework modeled after [web.py](http://webpy.org), [Sinatra](http://sinatrarb.com), and [Juno](http://brianreily.com/project/juno/).
-It allows the developer to map URLs directly to class methods.
+It allows the developer to map URIs to class methods while keeping their code DRY, and separating application logic and presentation.
 
 ## Your first application, or: never looking back
 

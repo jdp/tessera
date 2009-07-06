@@ -40,15 +40,11 @@ class Tessera {
 	function __construct($routes, $config = array()) {
 		$this->config = $config;
 		$this->request_method = $_SERVER['REQUEST_METHOD'];
-		/* Snag GET parameters and put them in get_params */
-		if (strpos($_SERVER['QUERY_STRING'], '?') === FALSE) {
-			$this->request_path = $_SERVER['QUERY_STRING'];
-			$this->get_params = array();
+		/* Snag the query string and use it as the request path */
+		if (isset($_SERVER['REDIRECT_QUERY_STRING'])) {
+			$_SERVER['QUERY_STRING'] = $_SERVER['REDIRECT_QUERY_STRING'];
 		}
-		else {
-			$this->request_path = substr($_SERVER['QUERY_STRING'], 0, strpos($_SERVER['QUERY_STRING'], '?'));
-			parse_str(substr($_SERVER['QUERY_STRING'], strpos($_SERVER['QUERY_STRING'], '?') + 1), $this->get_params);
-		}
+		$this->request_path = $_SERVER['QUERY_STRING'];
 		/* Set a default request path if necessary */
 		if (strlen($this->request_path) == 0) {
 			$this->request_path = '/';

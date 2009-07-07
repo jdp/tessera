@@ -145,9 +145,6 @@ class Tessera {
 		ob_start();
 		call_user_func_array(array($this, $action), array_values($this->params));
 		$this->script_output = ob_get_clean();
-		foreach($this->locals as $__local => $__value) {
-			${$__local} = $__value;
-		}
 		/* Load and execute the view file if it exists. Otherwise its value is the script output */
 		$view_html = $this->render($this->view, false);
 		$this->view_output = $view_html ? $view_html : $this->script_output;
@@ -173,6 +170,9 @@ class Tessera {
 			else {
 				return null;
 			}
+		}
+		foreach($this->locals as $__local => $__value) {
+			${$__local} = $__value;
 		}
 		ob_start();
 		include $view_file;

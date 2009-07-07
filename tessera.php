@@ -149,30 +149,35 @@ class Tessera {
 			${$__local} = $__value;
 		}
 		/* Load and execute the view file if it exists. Otherwise its value is the script output */
-		$view_file = $this->path_join('views', $this->view . '.html');
-		if (is_file($view_file)) {
-			ob_start();
-			include $view_file;
-			$this->view_output = ob_get_clean();
-		}
-		else {
-			$this->view_output = $this->script_output;
-		}
+		$view_html = $this->render($this->view, false);
+		$this->view_output = $view_html ? $view_html : $this->script_output;
 		/* Load, execute, and display the layout file. If it can't, display the view output */
 		if (isset($this->layout)) {
-			$layout_file = $this->path_join('views', $this->layout . '.html');
-			if (!is_file($layout_file)) {
-				trigger_error("Layout file <strong>{$layout_file}</strong> associated with <strong>{$action}</strong> not found", E_USER_ERROR);
-			}
-			ob_start();
-			include $layout_file;
-			$this->layout_output = ob_get_clean();
-			echo $this->layout_output;
+			$this->layout_output = $this->render($this->layout);
 		}
-		else {
-			echo $this->view_output;
-		}
+		echo isset($this->layout_output) ? $this->layout_output : $this->view_output;
 	}
-		
+	
+	/**
+	 * Renders a view and returns its HTML representation
+	 * @param string $view The name of the view
+	 * @param boolean $force Force the file to exist
+	 * @return string
+	 */
+	protected function render($view, $force = true) {
+		$view_file = $this->path_join('views', $view . '.html');
+		if (!is_file($view_file)) {
+			if ($force) {
+				trigger_error("View file <strong>{$view_file}</strong> associated with <strong>{$this->action}</strong> not found", E_USER_ERROR);
+			}
+			else {
+				return null;
+			}
+		}
+		ob_start();
+		include $view_file;
+		$html = ob_get_clean();
+		return $html;
+	}
 }
 ?>

@@ -1,0 +1,23 @@
+<?php if (isset($message)): ?>
+	<p class="info">
+		<?php echo $message; ?>
+	</p>
+<?php endif; ?>
+
+<form method="post" action="index.php?/add">
+	<fieldset>
+		<label for="title">Title</label>
+		<input type="text" name="title" id="title" />
+	</fieldset>
+	<fieldset>
+		<label for="body">Body</label>
+		<textarea name="body" id="body" rows="15" cols="60"></textarea>
+	</fieldset>
+	<fieldset>
+		<label for="password">Password</label>
+		<input type="password" name="password" id="password" />
+	</fieldset>
+	<fieldset>
+		<input type="submit" name="submit" value="Add Post" />
+	</fieldset>
+</form>

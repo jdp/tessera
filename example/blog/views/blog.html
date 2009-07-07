@@ -1,0 +1,28 @@
+<html>
+	<head>
+		<title>Nerdpress</title>
+		<style type="text/css">
+			h1 { font-size: 200%; margin: 0 0 .5em 0; }
+			#wrapper { width: 760px; margin: auto; }
+			#menu { padding: 0; margin: 0 0 1em 0; list-style-type: none; }
+			#menu li { display: inline; }
+			.post { margin: 0 0 1em 0; }
+			.post h3 { margin: 0; }
+			.post .meta { margin: 0 0 1em 0; }
+			#pagination { padding: 0; margin: 0; }
+			#pagination li { display: inline; }
+		</style>
+	</head>
+	<body>
+		<div id="wrapper">
+			<h1>Nerdpress</h1>
+			<ul id="menu">
+				<li><a href="index.php">Main</a></li>
+				<li><a href="index.php?/add">Add Post</a></li>
+			</ul>
+			<div>
+				<?php echo $this->view_output; ?>
+			</div>
+		</div>
+	</body>
+</html>

@@ -1,0 +1,25 @@
+<?php if (isset($message)): ?>
+	<p class="info">
+		<?php echo $message; ?>
+	</p>
+<?php endif; ?>
+
+<?php if (isset($post)): ?>
+	<form method="post" action="index.php?/edit/<?php echo $post['id'] ?>">
+		<fieldset>
+			<label for="title">Title</label>
+			<input type="text" name="title" id="title" value="<?php echo stripslashes($post['title']); ?>" />
+		</fieldset>
+		<fieldset>
+			<label for="body">Body</label>
+			<textarea name="body" id="body" rows="15" cols="60"><?php echo stripslashes($post['body']); ?></textarea>
+		</fieldset>
+		<fieldset>
+			<label for="password">Password</label>
+			<input type="password" name="password" id="password" />
+		</fieldset>
+		<fieldset>
+			<input type="submit" name="submit" value="Edit Post" />
+		</fieldset>
+	</form>
+<?php endif; ?>

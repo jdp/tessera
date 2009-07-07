@@ -1,0 +1,27 @@
+<?php if (count($posts) > 0): ?>
+	<?php foreach ($posts as $post): ?>
+		<div class="post">
+			<h3><a href="index.php?/post/<?php echo $post['id']; ?>"><?php echo stripslashes($post['title']); ?></a></h3>
+			<div class="meta">
+				<?php echo date('m/d/y g:i a', $post['date']); ?>
+				<a href="index.php?/edit/<?php echo $post['id']; ?>">Edit</a>
+				<a href="index.php?/remove/<?php echo $post['id']; ?>">Remove</a>
+			</div>
+			<div class="body">
+				<?php echo stripslashes(nl2br($post['body'])); ?>
+			</div>
+		</div>
+	<?php endforeach; ?>
+<?php else: ?>
+	<div class="info">
+		There are no posts!
+	</div>
+<?php endif; ?>
+
+<?php if (isset($pages)): ?>
+	<ul id="pagination">
+		<?php for ($pageno = 1; $pageno <= $pages; $pageno++): ?>
+			<li><a href="index.php?/page/<?php echo $pageno; ?>"><?php echo $pageno; ?></a></li>
+		<?php endfor; ?>
+	</ul>
+<?php endif; ?>

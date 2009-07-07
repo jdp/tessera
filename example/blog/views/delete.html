@@ -1,0 +1,18 @@
+<?php if (isset($message)): ?>
+	<p class="info">
+		<?php echo $message; ?>
+	</p>
+<?php endif; ?>
+
+<?php if (isset($post)): ?>
+	<form method="post" action="index.php?/remove/<?php echo $post['id'] ?>">
+		<p>You're sure you want to delete <?php echo stripslashes($post['title']); ?>?</p>
+		<fieldset>
+			<label for="password">Password</label>
+			<input type="password" name="password" id="password" />
+		</fieldset>
+		<fieldset>
+			<input type="submit" name="submit" value="Delete Post" />
+		</fieldset>
+	</form>
+<?php endif; ?>

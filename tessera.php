@@ -27,6 +27,13 @@ class Tessera {
 	 * @access private
 	 */
 	private $locals = array();
+	
+	/**
+	 * Generate clean or messy URLs
+	 * @var boolean
+	 * @access private
+	 */
+	private $clean_urls = false;
 
 	/**
 	 * Creates a Tessera application
@@ -67,7 +74,7 @@ class Tessera {
 	 * @param string $local The name of the variable
 	 * @param mixed $value The value of the variable
 	 */
-	function set($local, $value) {
+	protected function set($local, $value) {
 		if (is_string($local) && preg_match('/^[a-zA-Z_\x7f-\xff][a-zA-Z0-9_\x7f-\xff]*$/', $local)) {
 			$this->locals[$local] = $value;
 		}

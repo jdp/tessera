@@ -1,0 +1,13 @@
+$$ Nerdpress $$
+
+Nerdpress is an example blog application built with Tessera, using Redis as the
+data store. It is password protected, paginated, and you can add, edit, and
+delete individual posts.
+
+For more information, check out:
+
+    Redis, distributed persistent key-value store
+    http://code.google.com/p/redis
+    
+    Redisent, a PHP Redis interface
+    http://github.com/jdp/redisent

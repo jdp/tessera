@@ -2,6 +2,10 @@
 require '../tessera.php';
 
 class ArguableApp extends Tessera {
+
+	function index() {
+		echo 'Try clicking <a href="arguable.php?/foo/bar">here</a>.';
+	}
 	
 	function foo($bar) {
 		echo "Bar is {$bar}, and that's that";
@@ -10,5 +14,6 @@ class ArguableApp extends Tessera {
 }
 
 $basic = new ArguableApp(array(
+	'/' => 'index',
 	'/foo/$bar' => 'foo'
 ));

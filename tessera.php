@@ -171,9 +171,7 @@ class Tessera {
 				return null;
 			}
 		}
-		foreach($this->locals as $__local => $__value) {
-			${$__local} = $__value;
-		}
+		extract($this->locals);
 		ob_start();
 		include $view_file;
 		$html = ob_get_clean();

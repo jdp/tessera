@@ -86,19 +86,30 @@ class Tessera {
 	 */
 	private function compileRoutes($routes) {
 		$compiled_routes = array();
-		/* Replace each route with a regular expression */
+		/* Replace each route with a regular expression (if it isn't already) */
 		foreach ($routes as $pattern => $action) {
-			preg_match_all('/\/\$(\w+)/i', $pattern, $params);
+			if (substr($pattern, 0, 1) == '^') {
+				$compiled_routes[] = array(
+					'pattern' => str_replace('/', '\\/', $pattern),
+					'action'  => $action,
+				);
+				continue;
+			}
 			$compiled = array(
-				'pattern' => preg_quote($pattern, '/'),
+				'pattern' => '^' . preg_quote($pattern, '/'),
 				'action'  => $action
 			);
-			/* Replace all $params with a regular expression match, and save the $param */
-			foreach ($params[1] as $i => $v) {
-				$compiled['pattern'] = str_replace("/\\\${$v}", "/(\w+)", $compiled['pattern']);
+			/* Replace all named params with a regular expression match */
+			preg_match_all('/\/\$(\w+)/i', $pattern, $named_params);
+			foreach ($named_params[1] as $i => $v) {
+				$compiled['pattern'] = str_replace("/\\\${$v}", "/(?P<{$v}>\w+)", $compiled['pattern']);
 				$compiled['params'][$i] = $v;
 			}
-			array_push($compiled_routes, $compiled);
+			/* Replace all splat params with a regular expression match */
+			$compiled['pattern'] = preg_replace('/\\\\\*\\\\\*/', "(.*)", $compiled['pattern']);
+			$compiled['pattern'] = preg_replace('/\\\\\*([^*]?)/', "([^\/]*)$1", $compiled['pattern']);
+			/* Add the compiled pattern to the list of routes */
+			$compiled_routes[] = $compiled;
 		}
 		return $compiled_routes;
 	}
@@ -111,12 +122,23 @@ class Tessera {
 	 */
 	private function routeRequest($request_path, $routes) {
 		foreach($routes as $id => $route) {
-			if (preg_match("/^{$route['pattern']}$/i", $request_path, $raw)) {
-				$this->action = $route['action'];
+			$final_pattern = "/{$route['pattern']}(?:\/)?$/i";
+			if (preg_match($final_pattern, $request_path, $raw)) {
 				$this->params = array();
-				for($i = 1; $i < count($raw); $i++) {
-					$this->params[$route['params'][$i-1]] = $raw[$i];
+				$this->splat = array();
+				reset($raw); // Reset array iterator
+				next($raw); // Skip the whole URL match
+				while (list($key, $value) = each($raw)) {
+					$this->params[] = $value;
+					if (is_string($key)) {
+						$this->params[$key] = $value;
+						next($raw);
+					}
+					else {
+						$this->splat[] = $value;
+					}
 				}
+				$this->action = $route['action'];
 				return true;
 			}
 		}
@@ -133,7 +155,7 @@ class Tessera {
 			$this->view = $action;
 		}
 		/* Make sure the action is callable and not a Tessera internal */
-		$protected_actions = array('path_join', 'set', 'compileRoutes', 'routeRequest', 'respond');
+		$protected_actions = array('path_join', 'set', 'compileRoutes', 'routeRequest', 'respond', 'render');
 		if (!is_callable(array($this, $action)) || in_array($action, $protected_actions)) {
 			trigger_error("Unhandled not found request to <strong>{$this->request_path}</strong>", E_USER_ERROR);
 		}
@@ -143,7 +165,14 @@ class Tessera {
 			call_user_func(array($this, '__before'));
 		}
 		ob_start();
-		call_user_func_array(array($this, $action), array_values($this->params));
+		/* Send named params as function arguments, for backward compatibility */
+		$positionals = array();
+		foreach ($this->params as $name => $value) {
+			if (is_string($name)) {
+				$positionals[] = $value;
+			}
+		}
+		call_user_func_array(array($this, $action), $positionals);
 		$this->script_output = ob_get_clean();
 		/* Load and execute the view file if it exists. Otherwise its value is the script output */
 		$view_html = $this->render($this->view, false);

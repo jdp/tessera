@@ -17,23 +17,23 @@ class Tessera {
 	/**
 	 * Compiled regular expression routes that match requests to methods
 	 * @var array
-	 * @access private
+	 * @access protected
 	 */
-	private $routes;
+	protected $routes;
 	
 	/**
 	 * Local variables set by {@link Tessera::set} accessible to views and layouts
 	 * @var array
-	 * @access private
+	 * @access protected
 	 */
-	private $locals = array();
+	protected $locals = array();
 	
 	/**
 	 * Generate clean or messy URLs
 	 * @var boolean
 	 * @access private
 	 */
-	private $clean_urls = false;
+	protected $clean_urls = false;
 
 	/**
 	 * Creates a Tessera application
@@ -42,6 +42,7 @@ class Tessera {
 	 */
 	function __construct($routes, $config = array()) {
 		$this->config = $config;
+		$this->errors = array();
 		$this->request_method = $_SERVER['REQUEST_METHOD'];
 		/* Snag the query string and use it as the request path */
 		if (isset($_SERVER['REDIRECT_QUERY_STRING'])) {

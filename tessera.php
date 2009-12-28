@@ -152,6 +152,9 @@ class Tessera {
 	 */
 	private function respond($action) {
 		/* Layout defaults to layout.html, and view to <action>.html */
+		if (!isset($this->layout)) {
+			$this->layout = 'layout';
+		}
 		if (!isset($this->view)) {
 			$this->view = $action;
 		}

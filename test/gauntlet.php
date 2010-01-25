@@ -2,6 +2,8 @@
 require '../tessera.php';
 
 class Gauntlet extends Tessera {
+
+	public $layout = 'layout';
 	
 	function __before() {
 		?>
@@ -58,6 +60,10 @@ class Gauntlet extends Tessera {
 		echo "</pre>";
 	}
 	
+	function support() {
+		echo "<p>supporting you...{$this->params['page']}</p>";
+	}
+	
 }
 
 $gauntlet = new Gauntlet(array(
@@ -66,6 +72,7 @@ $gauntlet = new Gauntlet(array(
 	'/second/$foo' => 'named',
 	'/third/*' => 'splat',
 	'/fourth/$foo/*' => 'mixed',
+	'/support/$page' => 'support',
 	'^/fifth/(\w+)' => 'regex',
 	'/sixth/**' => 'splat',
 	'/seventh/$foo/*/$bar/**' => 'mixed'

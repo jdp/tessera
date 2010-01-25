@@ -103,7 +103,7 @@ class Tessera {
 			/* Replace all named params with a regular expression match */
 			preg_match_all('/\/\$(\w+)/i', $pattern, $named_params);
 			foreach ($named_params[1] as $i => $v) {
-				$compiled['pattern'] = str_replace("/\\\${$v}", "/(?P<{$v}>\w+)", $compiled['pattern']);
+				$compiled['pattern'] = str_replace("/\\\${$v}", "/(?P<{$v}>[\w\-]+)", $compiled['pattern']);
 				$compiled['params'][$i] = $v;
 			}
 			/* Replace all splat params with a regular expression match */

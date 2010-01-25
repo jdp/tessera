@@ -151,10 +151,7 @@ class Tessera {
 	 * @param string $action The name of the action being called
 	 */
 	private function respond($action) {
-		/* Layout defaults to layout.html, and view to <action>.html */
-		if (!isset($this->layout)) {
-			$this->layout = 'layout';
-		}
+		/* By default, there is no layout and view loads from <action>.html */
 		if (!isset($this->view)) {
 			$this->view = $action;
 		}

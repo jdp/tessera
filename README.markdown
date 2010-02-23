@@ -20,7 +20,7 @@ Here's a fully functional application:
     <?php
     require 'tessera.php';
     
-    class BasicApp extends Tessera {
+    class BasicApp extends Tessera\Base {
         function index() {
             echo "Deep down, deep down, dadi dadu dadu dadi dada";
         }
@@ -37,6 +37,10 @@ If everything was done properly, you should be greeted with Eiffel 65 lyrics.
 ### Getting nutty
 
 If you want to explore Tessera more, check out the [project wiki](http://wiki.github.com/jdp/tessera).
+
+### Notes
+
+This is a special branch of Tessera, made to work with PHP 5.3 and use namespacing and more than one class. See the test/ folder for the very small differences from the original Tessera.
 
 ## About
 

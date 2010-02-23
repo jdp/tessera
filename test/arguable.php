@@ -1,7 +1,7 @@
 <?php
 require '../tessera.php';
 
-class ArguableApp extends Tessera {
+class ArguableApp extends Tessera\Base {
 
 	function index() {
 		echo 'Try clicking <a href="arguable.php?/foo/bar">here</a>.';

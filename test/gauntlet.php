@@ -1,11 +1,11 @@
 <?php
 require '../tessera.php';
 
-class Gauntlet extends Tessera {
+class Gauntlet extends Tessera\Base {
 
-	public $layout = 'layout';
 	
 	function __before() {
+		$this->use_view = FALSE;
 		?>
 		<ul>
 			<li><a href="gauntlet.php?/first">/first</a></li>
@@ -18,6 +18,10 @@ class Gauntlet extends Tessera {
 		</ul>
 		<p>The current request is: <strong><?php echo $this->request_path; ?></strong></p>
 		<?php
+	}
+
+	function __after() {
+		$this->view->content = $this->action_output;
 	}
 
 	function index() {

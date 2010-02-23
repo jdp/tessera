@@ -1,15 +1,16 @@
 <?php
 require '../tessera.php';
 
-class LaidOutApp extends Tessera {
+class LaidOutApp extends Tessera\Base {
 
-	// use views/layout.html as a layout
-	var $layout = 'layout';
+	function __before() {
+		$this->view->name = 'layout';
+	}
 	
 	function main() {
-		// pass $lyrics to the view
-		// the view is in views/main.html
-		$this->set('lyrics', "Deep down, deep down, dadi dadu dadu dadi dada");
+		$partial = new Tessera\View('main');
+		$partial->lyrics = "Deep down, deep down, dadi dadu dadu dadi dada";
+		$this->view->content = $partial->render();
 	}
 	
 }

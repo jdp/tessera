@@ -1,12 +1,10 @@
 <?php
 require '../tessera.php';
 
-class ViewableApp extends Tessera {
+class ViewableApp extends Tessera\Base {
 
 	function main() {
-		// pass $lyrics to the view
-		// the view is in views/main.html
-		$this->set('lyrics', "Deep down, deep down, dadi dadu dadu dadi dada");
+		$this->view->set('lyrics', "Deep down, deep down, dadi dadu dadu dadi dada");
 	}
 	
 }

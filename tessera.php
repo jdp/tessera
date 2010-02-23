@@ -2,17 +2,112 @@
 /**
  * Tessera, another minimalist PHP framework
  * @author Justin Poliey <jdp34@njit.edu>
- * @copyright 2009 Justin Poliey <jdp34@njit.edu>
+ * @copyright 2009-2010 Justin Poliey <jdp34@njit.edu>
  * @license http://www.opensource.org/licenses/mit-license.php The MIT License
  * @package Tessera
  */
 
-error_reporting(E_ALL);
-
 /**
  * Tessera, a minimalist PHP framework
  */
-class Tessera {
+namespace Tessera;
+
+error_reporting(E_ALL);
+
+function path_join() {
+	return join(func_get_args(), DIRECTORY_SEPARATOR);
+}
+
+/*
+ * A simple wrapping for a View. A view is the visual representation of the
+ * code being run in the action matched to the route.
+ */
+class View {
+
+	/*
+	 * The name of the view without any file extension.
+	 * @access public
+	 */
+	public $name;
+
+	/*
+	 * The local variables available only to that view
+	 * @access protected
+	 */
+	protected $locals = array();
+
+	/*
+	 * Creates a new view and assigns it a name
+	 * @param string $name The name of the view
+	 */
+	public function __construct($name){
+		$this->name = $name;
+	}
+
+	public function __set($name, $value) {
+		$this->locals[$name] = $value;
+	}
+
+	public function & __get($name) {
+		return $this->locals[$name];
+	}
+
+	/*
+	 * Sets a variable local to the view. If passed an array, it will treat
+	 * the keys as the variable names and the values as the variable values.
+	 * @param string|array $name_or_array Either the name of the variable, or an array of name => variable mappings
+	 * @param any $value The value of the variable, if a name was provided
+	 */
+	public function set($name_or_array, $value = null) {
+		if (is_array($name_or_array)) {
+			foreach ($name_or_array as $name => $value) {
+				$this->locals[$name] = $value;
+			}
+		}
+		else if (is_string($name_or_array)) {
+			$this->locals[$name_or_array] = $value;
+		}
+	}
+
+	/*
+	 * Returns the filename of the view
+	 * @return string
+	 */
+	public function getFilename() {
+		return path_join('views', $this->name.'.php');
+	}
+
+	/*
+	 * Either returns the contents of a view's file, or outputs the contents
+	 * of the view's file directly, based on the value of the $echo parameter.
+	 * @param boolean $echo Whether or not to output the view contents directly
+	 * @return string
+	 */
+	public function render($echo = FALSE) {
+		if (file_exists($this->getFilename())) {
+			if (!$echo) {
+				ob_start();
+			}
+			extract($this->locals);
+			include $this->getFilename();
+			if (!$echo) {
+				return ob_get_clean();
+			}
+		}
+		else {
+			return null;
+		}
+	}
+
+}
+
+/*
+ * The Tessera base class is what responds to the requests. It looks for the
+ * first matching route and calls the matching action.
+ */
+class Base {
+
+	protected $layout = null;
 
 	/**
 	 * Compiled regular expression routes that match requests to methods
@@ -20,20 +115,6 @@ class Tessera {
 	 * @access protected
 	 */
 	protected $routes;
-	
-	/**
-	 * Local variables set by {@link Tessera::set} accessible to views and layouts
-	 * @var array
-	 * @access protected
-	 */
-	protected $locals = array();
-	
-	/**
-	 * Generate clean or messy URLs
-	 * @var boolean
-	 * @access private
-	 */
-	protected $clean_urls = false;
 
 	/**
 	 * Creates a Tessera application
@@ -48,11 +129,7 @@ class Tessera {
 		if (isset($_SERVER['REDIRECT_QUERY_STRING'])) {
 			$_SERVER['QUERY_STRING'] = $_SERVER['REDIRECT_QUERY_STRING'];
 		}
-		$this->request_path = $_SERVER['QUERY_STRING'];
-		/* Set a default request path if necessary */
-		if (strlen($this->request_path) == 0) {
-			$this->request_path = '/';
-		}
+		$this->request_path = empty($_SERVER['QUERY_STRING']) ? '/' : $_SERVER['QUERY_STRING'];
 		/* Compile all routes, select one, and respond */
 		$this->routes = $this->compileRoutes($routes);
 		if (!$this->routeRequest($this->request_path, $this->routes)) {
@@ -61,25 +138,6 @@ class Tessera {
 		}
 		$this->respond($this->action);
 	}
-	
-	/**
-	 * Returns a nicely formatted platform-independent path. Takes a variable number of arguments, each being part of a path
-	 * @return string
-	 */
-	private function path_join() {
-		return join(func_get_args(), DIRECTORY_SEPARATOR);
-	}
-	
-	/**
-	 * Makes a variable available to views and templates
-	 * @param string $local The name of the variable
-	 * @param mixed $value The value of the variable
-	 */
-	protected function set($local, $value) {
-		if (is_string($local) && preg_match('/^[a-zA-Z_\x7f-\xff][a-zA-Z0-9_\x7f-\xff]*$/', $local)) {
-			$this->locals[$local] = $value;
-		}
-	}
 
 	/**
 	 * Compiles Tessera routes into regular expressions
@@ -87,7 +145,7 @@ class Tessera {
 	 */
 	private function compileRoutes($routes) {
 		$compiled_routes = array();
-		/* Replace each route with a regular expression (if it isn't already) */
+		/* Replace each route with a regexp (if it isn't a regexp already) */
 		foreach ($routes as $pattern => $action) {
 			if (substr($pattern, 0, 1) == '^') {
 				$compiled_routes[] = array(
@@ -151,21 +209,18 @@ class Tessera {
 	 * @param string $action The name of the action being called
 	 */
 	private function respond($action) {
-		/* By default, there is no layout and view loads from <action>.html */
-		if (!isset($this->view)) {
-			$this->view = $action;
-		}
 		/* Make sure the action is callable and not a Tessera internal */
-		$protected_actions = array('path_join', 'set', 'compileRoutes', 'routeRequest', 'respond', 'render');
+		$protected_actions = array('compileRoutes', 'routeRequest', 'respond', 'render');
 		if (!is_callable(array($this, $action)) || in_array($action, $protected_actions)) {
 			trigger_error("Unhandled not found request to <strong>{$this->request_path}</strong>", E_USER_ERROR);
 		}
+		$this->view = new View($action);
 		/* Call the action and snag its output */
 		$this->locals = array();
+		ob_start();
 		if (is_callable(array($this, '__before'))) {
 			call_user_func(array($this, '__before'));
 		}
-		ob_start();
 		/* Send named params as function arguments, for backward compatibility */
 		$positionals = array();
 		foreach ($this->params as $name => $value) {
@@ -173,39 +228,22 @@ class Tessera {
 				$positionals[] = $value;
 			}
 		}
-		call_user_func_array(array($this, $action), $positionals);
-		$this->script_output = ob_get_clean();
-		/* Load and execute the view file if it exists. Otherwise its value is the script output */
-		$view_html = $this->render($this->view, false);
-		$this->view_output = $view_html ? $view_html : $this->script_output;
-		/* Load, execute, and display the layout file. If it can't, display the view output */
-		if (isset($this->layout)) {
-			$this->layout_output = $this->render($this->layout);
+		if (!isset($this->use_view)) {
+			$this->use_view = TRUE;
 		}
-		echo isset($this->layout_output) ? $this->layout_output : $this->view_output;
+		call_user_func_array(array($this, $action), $positionals);
+		$this->action_output = ob_get_clean();
+		if (is_callable(array($this, '__after'))) {
+			call_user_func(array($this, '__after'));
+		}
+		/* Load and execute the layout if it is loaded. Otherwise use action output */
+		if (file_exists($this->view->getFilename()) AND $this->use_view) {
+			$this->view->render(TRUE);
+		}
+		else {
+			echo $this->action_output;
+		}
 	}
 	
-	/**
-	 * Renders a view and returns its HTML representation
-	 * @param string $view The name of the view
-	 * @param boolean $force Force the file to exist
-	 * @return string
-	 */
-	protected function render($view, $force = true) {
-		$view_file = $this->path_join('views', $view . '.html');
-		if (!is_file($view_file)) {
-			if ($force) {
-				trigger_error("View file <strong>{$view_file}</strong> associated with <strong>{$this->action}</strong> not found", E_USER_ERROR);
-			}
-			else {
-				return null;
-			}
-		}
-		extract($this->locals);
-		ob_start();
-		include $view_file;
-		$html = ob_get_clean();
-		return $html;
-	}
 }
 ?>
